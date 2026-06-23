@@ -1,12 +1,4 @@
 {
-  "extends": "@repo/typescript-config/base.json",
-  "compilerOptions": {
-    "module": "ESNext",
-    "moduleResolution": "bundler",
-    "target": "ES2023",
-    "strict": true,
-    "esModuleInterop": true,
-    "outDir": "./dist",
-    "rootDir": "./src"
-  }
+  "extends": "@repo/typescript-config/backend_config.json",
+ 
 }
