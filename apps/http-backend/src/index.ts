@@ -8,13 +8,13 @@ app.use(express.json());
 app.use(cors());
 
 import auth from "./middleware";
+import { prisma } from "@repo/db/client";
+import { JWT_SECRET } from "@repo/backend-common/config";
 import {
   CreateUserSchema,
   RoomSchema,
   UserSigninSchema,
 } from "@repo/common/types";
-import { prisma } from "@repo/db/client";
-import { JWT_SECRET } from "@repo/backend-common/config";
 
 app.post("/signup", async (req, res) => {
   const inputs = CreateUserSchema.safeParse(req.body);
@@ -81,6 +81,43 @@ app.post("/create-room", auth, async (req, res) => {
     res.status(411).json({ error: "room-name already exist" });
   }
 });
-app.post("room/:roomId", auth, async (req, res) => {});
+app.get("/chats/:roomId", async (req, res) => {
+    try {
+        const roomId = Number(req.params.roomId);
+        console.log(req.params.roomId);
+        const messages = await prisma.chat.findMany({
+            where: {
+                roomId: roomId
+            },
+            orderBy: {
+                id: "desc"
+            },
+            take: 1000
+        });
+
+        res.json({
+            messages
+        })
+    } catch(e) {
+        console.log(e);
+        res.json({
+            messages: []
+        })
+    }
+    
+})
+
+app.get("/room/:slug", async (req, res) => {
+    const slug = req.params.slug;
+    const room = await prisma.room.findFirst({
+        where: {
+            slug
+        }
+    });
+
+    res.json({
+        room
+    })
+})
 
 app.listen(3002);
